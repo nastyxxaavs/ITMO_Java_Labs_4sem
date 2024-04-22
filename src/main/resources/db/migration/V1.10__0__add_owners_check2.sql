@@ -1,0 +1,1 @@
+INSERT INTO owners VALUES ('99944b22-6308-65c9-a652-6efc6f55f00f', 'Egor', '2010-05-23');
