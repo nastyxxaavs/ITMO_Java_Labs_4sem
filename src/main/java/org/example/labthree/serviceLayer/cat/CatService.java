@@ -1,6 +1,7 @@
 package org.example.labthree.serviceLayer.cat;
 
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
+import org.example.labthree.dataAccessLayer.entities.cat.CatFinderDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
 
 import java.util.List;
@@ -18,5 +19,6 @@ public interface CatService {
     public OwnerDto findOwnerById(UUID id);
 
     public List<CatDto> findAll();
+    List<CatDto> findCatsByParam(CatFinderDto param);
 }
 

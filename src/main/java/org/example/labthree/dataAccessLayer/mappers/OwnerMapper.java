@@ -31,6 +31,6 @@ public class OwnerMapper {
         //List<CatBase> cats = catsRepo.findCatBaseByOwnerId(owner.getId());
         //return new OwnerBase(owner.getId(), owner.getName(), owner.getDateOfBirth(), cats);
         //return modelMapper.map(owner, OwnerBase.class);
-        return new OwnerBase(owner.getId(), owner.getName(), owner.getDateOfBirth(), owner.getCats().stream().map(x -> catsRepo.findById(x).get()).toList());
+        return new OwnerBase(owner.getId(), owner.getName(), owner.getDateOfBirth(), owner.getCats().stream().map(x -> catsRepo.findById(x).orElse(null)).toList());
     }
 }

@@ -34,6 +34,8 @@ public class CatBase {
     private LocalDate dateOfBirth;
     @Column(name = "species")
     private String species;
+    @Enumerated(EnumType.STRING)
+    @Convert(converter = ConverterOfColor.class)
     @Column(name = "color")
     private CatColors color;
 

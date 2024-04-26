@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 @Repository
@@ -19,8 +20,11 @@ public interface OwnerDao extends JpaRepository<OwnerBase, UUID> {
     List<OwnerBase> save(Iterable<? extends OwnerBase> entities);
 
     void flush();
+    java.util.Optional<OwnerBase> findById(UUID id );
 
     OwnerBase saveAndFlush(OwnerBase entity);
 
     void deleteInBatch(Iterable<OwnerBase> entities);
+    List<OwnerBase> findByName(String name);
+    List<OwnerBase> findByDateOfBirth(LocalDate dateOfBirth);
 }

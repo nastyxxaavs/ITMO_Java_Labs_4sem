@@ -3,12 +3,14 @@ package org.example.labthree.controllerLayer;
 
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
+import org.example.labthree.dataAccessLayer.entities.owner.OwnerFinderDto;
 import org.example.labthree.serviceLayer.owner.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,19 +23,31 @@ public class OwnerController {
         this.ownerService = currentOwnerService;
     }
 
-    @PostMapping(value = "/owners")
+    @PostMapping(value = "/owners", produces = "application/json", consumes = "application/json")
     public ResponseEntity<?> save(@RequestBody OwnerDto owner) {
         ownerService.saveOwner(owner);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping(value = "/owners")
-    public ResponseEntity<List<OwnerDto>> read() {
-        final List<OwnerDto> owners = ownerService.findAllOwners();
+    public ResponseEntity<List<OwnerDto>> read(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth
+    ) {
+        if (name != null || dateOfBirth != null) {
+            var param = new OwnerFinderDto(name, dateOfBirth);
+            final List<OwnerDto> owner = ownerService.findOwnersByParam(param);
 
-        return owners != null &&  !owners.isEmpty()
-                ? new ResponseEntity<>(owners, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return owner != null
+                    ? new ResponseEntity<>(owner, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            final List<OwnerDto> owners = ownerService.findAllOwners();
+
+            return owners != null && !owners.isEmpty()
+                    ? new ResponseEntity<>(owners, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(value = "/owners/{id}")
@@ -62,14 +76,5 @@ public class OwnerController {
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
-
-    /*@GetMapping(value = "/owners/{id}")
-    public ResponseEntity<CatDto> readCat(@PathVariable(name = "id") UUID id) {
-        final CatDto cat = ownerService.findCatById(id);
-
-        return cat != null
-                ? new ResponseEntity<>(cat, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }*/
 
 }
