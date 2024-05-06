@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.labthree.dataAccessLayer.entities.cat.CatBase;
+import org.example.labthree.dataAccessLayer.entities.user.UserBase;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
@@ -34,6 +35,11 @@ public class OwnerBase {
 
     @OneToMany(mappedBy = "ownerId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CatBase> cats;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private UserBase user;
 
 
     public OwnerBase(String name, LocalDate date) {

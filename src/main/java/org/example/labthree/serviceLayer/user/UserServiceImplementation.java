@@ -7,15 +7,15 @@ import org.example.labthree.dataAccessLayer.dao.UserDao;
 import org.example.labthree.dataAccessLayer.entities.role.RoleBase;
 import org.example.labthree.dataAccessLayer.entities.user.UserBase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Service
+/*@Service
 @Slf4j
 //@RequiredArgsConstructor
 public class UserServiceImplementation implements UserService{
@@ -47,8 +47,8 @@ public class UserServiceImplementation implements UserService{
         return result;
     }
     @Override
-    public UserBase findByUserName(String userName){
-        UserBase result = userRepository.findByUserName(userName);
+    public Optional<UserBase> findByUserName(String userName){
+        Optional<UserBase> result = userRepository.findByUserName(userName);
         log.info("IN findByUserName - user: {} found by username: {}", result, userName);
         return result;
     }
@@ -65,4 +65,4 @@ public class UserServiceImplementation implements UserService{
         userRepository.deleteById(id);
     }
 
-}
+}*/
