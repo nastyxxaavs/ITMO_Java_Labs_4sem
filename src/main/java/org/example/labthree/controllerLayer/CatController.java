@@ -3,7 +3,7 @@ package org.example.labthree.controllerLayer;
 
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.cat.CatFinderDto;
-import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
+
 import org.example.labthree.dataAccessLayer.models.CatColors;
 import org.example.labthree.serviceLayer.cat.CatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;

@@ -21,15 +21,13 @@ public class UserBase {
     private UUID id;
     @Column(name = "user_name")
     private String userName;
-    @Column(name = "full_name")
-    private String fullName;
     @Column(name = "email")
     private String email;
     @Column(name = "password")
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne
+    @JoinColumn(name = "owner_id")
     private OwnerBase owner;
 
     @ManyToMany(fetch = FetchType.EAGER)

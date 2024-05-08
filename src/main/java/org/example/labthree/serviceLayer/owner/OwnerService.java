@@ -21,4 +21,7 @@ public interface OwnerService {
     public CatDto findCatById(UUID id);
     List<OwnerDto> findOwnersByParam(OwnerFinderDto param);
 
+    OwnerDto addOrUpdateOwnerWithDtoByUsername(String userName);
+    OwnerDto getOwnerDtoByUsername(String userName);
+
 }

@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RoleDao extends JpaRepository<RoleBase, UUID> {
-    RoleBase findByName(String name);
+    Optional<RoleBase> findByName(String name);
 }

@@ -19,8 +19,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     private final CurrentUserDetailsService currentUserDetailsService;
     @Autowired
-    public SecurityConfig(CurrentUserDetailsService currentUserDetailsService) {
-        this.currentUserDetailsService = currentUserDetailsService;
+    public SecurityConfig(CurrentUserDetailsService curUserDetailsService) {
+        this.currentUserDetailsService = curUserDetailsService;
     }
 
     @Bean

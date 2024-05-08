@@ -80,4 +80,13 @@ public class OwnerServiceImplementation  implements OwnerService {
         }
         return owners.stream().map(ownerMapper::convertToDto).collect(Collectors.toList());
     }
+
+    @Override
+    OwnerDto addOrUpdateOwnerWithDtoByUsername(String userName){
+
+    }
+    @Override
+    OwnerDto getOwnerDtoByUsername(String userName){
+
+    }
 }

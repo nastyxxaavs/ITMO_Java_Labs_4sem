@@ -36,10 +36,10 @@ public class OwnerBase {
     @OneToMany(mappedBy = "ownerId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CatBase> cats;
 
-    @OneToOne
+    /*@OneToOne
     @MapsId
     @JoinColumn(name = "id")
-    private UserBase user;
+    private UserBase user;*/
 
 
     public OwnerBase(String name, LocalDate date) {
