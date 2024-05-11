@@ -1,6 +1,7 @@
 package org.example.labthree.serviceLayer.owner;
 
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
+import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerFinderDto;
 
@@ -21,7 +22,8 @@ public interface OwnerService {
     public CatDto findCatById(UUID id);
     List<OwnerDto> findOwnersByParam(OwnerFinderDto param);
 
-    OwnerDto addOrUpdateOwnerWithDtoByUsername(String userName);
+    OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String userName);
     OwnerDto getOwnerDtoByUsername(String userName);
+    public OwnerDto findOwnerByName(String name);
 
 }

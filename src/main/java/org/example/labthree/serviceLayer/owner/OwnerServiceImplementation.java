@@ -4,12 +4,15 @@ package org.example.labthree.serviceLayer.owner;
 import lombok.RequiredArgsConstructor;
 import org.example.labthree.dataAccessLayer.dao.CatDao;
 import org.example.labthree.dataAccessLayer.dao.OwnerDao;
+import org.example.labthree.dataAccessLayer.dao.UserDao;
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerFinderDto;
+import org.example.labthree.dataAccessLayer.entities.user.UserBase;
 import org.example.labthree.dataAccessLayer.mappers.CatMapper;
 import org.example.labthree.dataAccessLayer.mappers.OwnerMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +27,16 @@ public class OwnerServiceImplementation  implements OwnerService {
     private final OwnerMapper ownerMapper;
     private final CatMapper catMapper;
     private final CatDao catRepository;
+    private final UserDao userRepository;
     @Override
     public OwnerDto findOwner(UUID id){
         var owner = ownerRepository.getReferenceById(id);
+        return ownerMapper.convertToDto(owner);
+    }
+
+    @Override
+    public OwnerDto findOwnerByName(String name){
+        var owner = ownerRepository.findByUsername(name);
         return ownerMapper.convertToDto(owner);
     }
 
@@ -82,11 +92,21 @@ public class OwnerServiceImplementation  implements OwnerService {
     }
 
     @Override
-    OwnerDto addOrUpdateOwnerWithDtoByUsername(String userName){
+    public OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String userName){
+        UserBase user = userRepository.findByUserName(userName).orElseThrow(() -> new UsernameNotFoundException("UserEntity with current username does not exists"));
 
+        var ownerBase = ownerMapper.convertToBase(ownerDto);
+        ownerBase.setName(user.getUserName());
+        ownerBase.setId(user.getId());
+        user.setOwner(ownerBase);
+
+        ownerRepository.save(ownerBase);
+        userRepository.save(user);
+
+        return ownerBase;
     }
     @Override
-    OwnerDto getOwnerDtoByUsername(String userName){
-
+    public OwnerDto getOwnerDtoByUsername(String userName){
+        return findOwnerByName(userName);
     }
 }

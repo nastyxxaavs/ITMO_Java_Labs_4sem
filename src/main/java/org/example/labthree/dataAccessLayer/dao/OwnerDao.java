@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 @Repository
 @NonNullApi
@@ -21,6 +22,7 @@ public interface OwnerDao extends JpaRepository<OwnerBase, UUID> {
 
     void flush();
     java.util.Optional<OwnerBase> findById(UUID id );
+    OwnerBase findByUsername(String name);
 
     OwnerBase saveAndFlush(OwnerBase entity);
 
