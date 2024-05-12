@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.labthree.dataAccessLayer.dao.RoleDao;
 import org.example.labthree.dataAccessLayer.dao.UserDao;
+import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.entities.role.RoleBase;
 import org.example.labthree.dataAccessLayer.entities.user.UserBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +50,14 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public UserBase getUserById(UUID userEntityId) {
-        return userRepository.findById(userEntityId).orElseThrow(() -> new UsernameNotFoundException("UseEntity with current id does not exists"));
+    public UserBase getUserById(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("UseEntity with current id does not exists"));
     }
 
+
     @Override
-    public UserBase getUserByUserName(String username) {
-        return userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("UseEntity with current username does not exists"));
+    public UserBase getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("UseEntity with current username does not exists"));
     }
 }
 /*@Service

@@ -43,7 +43,7 @@ public class AuthController {
     public ResponseEntity<String> login(@RequestBody LoginUserDto loginDto){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginDto.getUserName(),
+                        loginDto.getUsername(),
                         loginDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,20 +53,20 @@ public class AuthController {
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody LoginUserDto loginDto) {
-        if (userRepository.existsByUserName(loginDto.getUserName())) {
+        if (userRepository.existsByUsername(loginDto.getUsername())) {
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
         }
 
         UserBase user = new UserBase();
-        user.setUserName(loginDto.getUserName());
+        user.setUsername(loginDto.getUsername());
         user.setPassword(passwordEncoder.encode((loginDto.getPassword())));
 
-        RoleBase roles = roleRepository.findByName("USER").get();
+        RoleBase roles = roleRepository.findByName("ROLE_USER").get();
         user.setRoles(Collections.singletonList(roles));
 
         OwnerBase owner = new OwnerBase();
         owner.setId(user.getId());
-        owner.setName(user.getUserName());
+        owner.setName(user.getUsername());
         //owner.setUser(user);
 
         user.setOwner(owner);

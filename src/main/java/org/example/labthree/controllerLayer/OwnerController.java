@@ -31,28 +31,18 @@ public class OwnerController {
         this.ownerRepository = ownerDao;
     }
 
-    @PostMapping(value = "/owners/{username}", produces = "application/json", consumes = "application/json")
+    @PostMapping(value = "/owners", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<?> save(@RequestBody OwnerDto owner, @PathVariable("username") String userName) {
-        //ownerService.saveOwner(owner);
-        ownerService.addOrUpdateOwnerWithDtoByUsername(owner, userName);
-
-        boolean isUserTheAdmin = userService.getUserByUserName(userName).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(userName) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> save(@RequestBody OwnerDto owner) {
+        ownerService.saveOwner(owner);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/owners/{username}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping(value = "/owners")
     public ResponseEntity<List<OwnerDto>> read(
             @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth,
-            @PathVariable(name = "username") String userName
+            @RequestParam(name = "dateOfBirth", required = false) LocalDate dateOfBirth
     ) {
-        boolean isUserTheAdmin = userService.getUserByUserName(userName).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(userName) && !isUserTheAdmin) {
             if (name != null || dateOfBirth != null) {
                 var param = new OwnerFinderDto(name, dateOfBirth);
                 final List<OwnerDto> owner = ownerService.findOwnersByParam(param);
@@ -68,21 +58,9 @@ public class OwnerController {
                         ? new ResponseEntity<>(owners, HttpStatus.OK)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
-    /*@GetMapping(value = "/owners/{id}")
-    public ResponseEntity<OwnerDto> read(@PathVariable(name = "id") UUID id) {
-        final OwnerDto owner = ownerService.findOwner(id);
-
-        return owner != null
-                ? new ResponseEntity<>(owner, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }*/
-
-    @GetMapping(value = "/owners/details/{username}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+    @GetMapping(value = "/owners/{username}")
     public ResponseEntity<OwnerDto> read(@PathVariable(name = "username") String username) {
         final OwnerDto owner = ownerService.getOwnerDtoByUsername(username);
 
@@ -91,30 +69,19 @@ public class OwnerController {
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping(value = "/owners/{username}")
+    @PutMapping(value = "/owners/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<?> update(@PathVariable(name = "username") String userName, @RequestBody OwnerDto owner) {
-        //final boolean updated = ownerService.updateOwner(owner, id);
-        boolean isUserTheAdmin = userService.getUserByUserName(userName).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(userName) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        ownerService.addOrUpdateOwnerWithDtoByUsername(owner, userName);
-        final boolean updated = ownerRepository.existsById(owner.getId());
+    public ResponseEntity<?> update(@PathVariable(name = "id") UUID id, @RequestBody OwnerDto owner) {
+        final boolean updated = ownerService.updateOwner(owner, id);
         return updated
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
     @DeleteMapping(value = "/owners/{username}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<?> delete(@PathVariable(name = "username") String userName) {
-        //final boolean deleted = ownerService.deleteOwner(id);
-        boolean isUserTheAdmin = userService.getUserByUserName(userName).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(userName) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        OwnerDto owner = ownerService.getOwnerDtoByUsername(userName);
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> delete(@PathVariable(name = "username") String username) {
+        OwnerDto owner = ownerService.getOwnerDtoByUsername(username);
         ownerService.deleteOwner(owner.getId());
         final boolean deleted = ownerRepository.existsById(owner.getId());
         return deleted

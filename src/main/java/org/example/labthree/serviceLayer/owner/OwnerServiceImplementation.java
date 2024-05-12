@@ -4,18 +4,22 @@ package org.example.labthree.serviceLayer.owner;
 import lombok.RequiredArgsConstructor;
 import org.example.labthree.dataAccessLayer.dao.CatDao;
 import org.example.labthree.dataAccessLayer.dao.OwnerDao;
+import org.example.labthree.dataAccessLayer.dao.RoleDao;
 import org.example.labthree.dataAccessLayer.dao.UserDao;
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerFinderDto;
+import org.example.labthree.dataAccessLayer.entities.role.RoleBase;
 import org.example.labthree.dataAccessLayer.entities.user.UserBase;
 import org.example.labthree.dataAccessLayer.mappers.CatMapper;
 import org.example.labthree.dataAccessLayer.mappers.OwnerMapper;
+import org.example.labthree.serviceLayer.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,6 +32,8 @@ public class OwnerServiceImplementation  implements OwnerService {
     private final CatMapper catMapper;
     private final CatDao catRepository;
     private final UserDao userRepository;
+    private final RoleDao roleRepository;
+    private final UserService userService;
     @Override
     public OwnerDto findOwner(UUID id){
         var owner = ownerRepository.getReferenceById(id);
@@ -36,7 +42,7 @@ public class OwnerServiceImplementation  implements OwnerService {
 
     @Override
     public OwnerDto findOwnerByName(String name){
-        var owner = ownerRepository.findByUsername(name);
+        var owner = ownerRepository.findByName(name);
         return ownerMapper.convertToDto(owner);
     }
 
@@ -44,6 +50,12 @@ public class OwnerServiceImplementation  implements OwnerService {
     public void saveOwner(OwnerDto owner){
         var ownerBase = ownerMapper.convertToBase(owner);
         ownerRepository.save(ownerBase);
+        UserBase user = new UserBase();
+        user.setUsername(ownerBase.getName());
+        RoleBase roles = roleRepository.findByName("ROLE_USER").get();
+        user.setRoles(Collections.singletonList(roles));
+        user.setOwner(ownerBase);
+        userRepository.save(user);
     }
 
     @Override
@@ -58,9 +70,14 @@ public class OwnerServiceImplementation  implements OwnerService {
     @Override
     public Boolean updateOwner(OwnerDto owner, UUID id){
         var ownerBase = ownerMapper.convertToBase(owner);
+        OwnerBase prevOwner = ownerRepository.getReferenceById(id);
+        UserBase user = userService.getUserByUsername(prevOwner.getName());
         if (ownerRepository.existsById(id)){
             ownerBase.setId(id);
             ownerRepository.save(ownerBase);
+            user.setUsername(ownerBase.getName());
+            user.setOwner(ownerBase);
+            userRepository.save(user);
             return true;
         }
         return false;
@@ -83,7 +100,7 @@ public class OwnerServiceImplementation  implements OwnerService {
     public List<OwnerDto> findOwnersByParam(OwnerFinderDto param) {
         List<OwnerBase> owners = null;
         if (param.getName() != null) {
-            owners = ownerRepository.findByName(param.getName());
+            owners = ownerRepository.findOwnerByName(param.getName());
         }
         else if (param.getDateOfBirth() != null) {
             owners = ownerRepository.findByDateOfBirth(param.getDateOfBirth());
@@ -92,11 +109,11 @@ public class OwnerServiceImplementation  implements OwnerService {
     }
 
     @Override
-    public OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String userName){
-        UserBase user = userRepository.findByUserName(userName).orElseThrow(() -> new UsernameNotFoundException("UserEntity with current username does not exists"));
+    public OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String username){
+        UserBase user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("UserEntity with current username does not exists"));
 
         var ownerBase = ownerMapper.convertToBase(ownerDto);
-        ownerBase.setName(user.getUserName());
+        ownerBase.setName(user.getUsername());
         ownerBase.setId(user.getId());
         user.setOwner(ownerBase);
 
@@ -106,7 +123,7 @@ public class OwnerServiceImplementation  implements OwnerService {
         return ownerBase;
     }
     @Override
-    public OwnerDto getOwnerDtoByUsername(String userName){
-        return findOwnerByName(userName);
+    public OwnerDto getOwnerDtoByUsername(String username){
+        return findOwnerByName(username);
     }
 }

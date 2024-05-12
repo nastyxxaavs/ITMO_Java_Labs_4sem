@@ -22,11 +22,11 @@ public interface OwnerDao extends JpaRepository<OwnerBase, UUID> {
 
     void flush();
     java.util.Optional<OwnerBase> findById(UUID id );
-    OwnerBase findByUsername(String name);
+    OwnerBase findByName(String name);
 
     OwnerBase saveAndFlush(OwnerBase entity);
 
     void deleteInBatch(Iterable<OwnerBase> entities);
-    List<OwnerBase> findByName(String name);
+    List<OwnerBase> findOwnerByName(String name);
     List<OwnerBase> findByDateOfBirth(LocalDate dateOfBirth);
 }

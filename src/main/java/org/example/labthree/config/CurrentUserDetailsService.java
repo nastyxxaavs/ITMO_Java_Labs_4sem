@@ -28,9 +28,9 @@ public class CurrentUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserBase user = userRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+        UserBase user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
-        return new User(user.getUserName(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
+        return new User(user.getUsername(), user.getPassword(), mapRolesToAuthorities(user.getRoles()));
     }
 
     private Collection<GrantedAuthority> mapRolesToAuthorities(List<RoleBase> roles){

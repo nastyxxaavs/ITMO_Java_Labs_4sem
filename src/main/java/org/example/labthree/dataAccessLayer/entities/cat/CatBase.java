@@ -10,6 +10,8 @@ import lombok.Setter;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.models.CatColors;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,11 +41,13 @@ public class CatBase {
     @Column(name = "color")
     private CatColors color;
 
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private OwnerBase ownerId;
 
 
+    //@OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToMany(targetEntity = CatBase.class, fetch = FetchType.EAGER)
     @JoinTable(
             name = "cats_friends",
