@@ -35,7 +35,6 @@ public class OwnerBase {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "ownerId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CatBase> cats;
 

@@ -31,7 +31,7 @@ public class UserBase {
     private String password;
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
-    @OneToOne//(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id")
     private OwnerBase owner;
 

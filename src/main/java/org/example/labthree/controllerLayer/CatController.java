@@ -56,22 +56,23 @@ public class CatController {
     ) {
         boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
         if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin) {
-            if (name != null || dateOfBirth != null || species != null || color != null) {
-                var param = new CatFinderDto(name, dateOfBirth, species, color);
-                final List<CatDto> cat = catService.findCatsByParam(param);
-
-                return cat != null
-                        ? new ResponseEntity<>(cat, HttpStatus.OK)
-                        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } else {
-                final List<CatDto> cats = catService.findAll();
-
-                return cats != null && !cats.isEmpty()
-                        ? new ResponseEntity<>(cats, HttpStatus.OK)
-                        : new ResponseEntity<>(cats, HttpStatus.NO_CONTENT);
-            }
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
+        if (name != null || dateOfBirth != null || species != null || color != null) {
+            var param = new CatFinderDto(name, dateOfBirth, species, color);
+            final List<CatDto> cat = catService.findCatsByParam(param);
+
+            return cat != null
+                    ? new ResponseEntity<>(cat, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            final List<CatDto> cats = catService.findAll();
+
+            return cats != null && !cats.isEmpty()
+                    ? new ResponseEntity<>(cats, HttpStatus.OK)
+                    : new ResponseEntity<>(cats, HttpStatus.NO_CONTENT);
+        }
     }
 
     @GetMapping(value = "/cats/{username}/{id}")

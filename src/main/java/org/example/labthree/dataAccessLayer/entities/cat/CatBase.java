@@ -48,7 +48,7 @@ public class CatBase {
 
 
     //@OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToMany(targetEntity = CatBase.class, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = CatBase.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "cats_friends",
             joinColumns = { @JoinColumn(name = "cat_id")},

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,8 @@ public class OwnerServiceImplementation  implements OwnerService {
     @Override
     public Boolean deleteOwner(UUID id){
         if (ownerRepository.existsById(id)){
+            Optional<UserBase> user = userRepository.findByUsername(ownerRepository.findById(id).get().getName());
+            userRepository.delete(user.get());
             ownerRepository.deleteById(id);
             return true;
         }
@@ -108,7 +111,7 @@ public class OwnerServiceImplementation  implements OwnerService {
         return owners.stream().map(ownerMapper::convertToDto).collect(Collectors.toList());
     }
 
-    @Override
+    /*@Override
     public OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String username){
         UserBase user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("UserEntity with current username does not exists"));
 
@@ -121,7 +124,7 @@ public class OwnerServiceImplementation  implements OwnerService {
         userRepository.save(user);
 
         return ownerBase;
-    }
+    }*/
     @Override
     public OwnerDto getOwnerDtoByUsername(String username){
         return findOwnerByName(username);
