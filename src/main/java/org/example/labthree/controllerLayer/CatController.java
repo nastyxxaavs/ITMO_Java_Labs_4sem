@@ -69,11 +69,21 @@ public class CatController {
                         ? new ResponseEntity<>(cats, HttpStatus.OK)
                         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            final List<CatDto> cat = catService.findCatsByParam(param);//////////////////////дописать!!!!!!
-            return cat != null
-                    ? new ResponseEntity<>(cat, HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            final List<UUID> catBases = owner.getCats();
+            List<CatDto> cats = new ArrayList<CatDto>();
+            for (UUID each : catBases) {
+                CatDto catDto = catService.findCat(each);
+                final List<CatDto> cat = catService.findCatsByParam(param);
+                for(CatDto cat1 : cat){
+                    if (cat1.getId().equals(catDto.getId())){
+                        cats.add(cat1);
+                        return new ResponseEntity<>(cats, HttpStatus.OK);
+                    }
+                    //return new ResponseEntity<>(cats, HttpStatus.NOT_FOUND);
+                }
+            }
+            //final List<CatDto> cat = catService.findCatsByParam(param);//////////////////////дописать!!!!!!
+            return new ResponseEntity<>(cats, HttpStatus.NOT_FOUND);
         }
         else {
             if (isUserTheAdmin) {
