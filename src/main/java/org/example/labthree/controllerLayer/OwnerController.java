@@ -21,13 +21,11 @@ import java.util.UUID;
 @RestController
 public class OwnerController {
     private final OwnerService ownerService;
-    private final UserService userService;
     private final OwnerDao ownerRepository;
 
     @Autowired
-    public OwnerController(OwnerService currentOwnerService, UserService currentUserService, OwnerDao ownerDao) {
+    public OwnerController(OwnerService currentOwnerService, OwnerDao ownerDao) {
         this.ownerService = currentOwnerService;
-        this.userService = currentUserService;
         this.ownerRepository = ownerDao;
     }
 

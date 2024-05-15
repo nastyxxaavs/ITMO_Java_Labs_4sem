@@ -7,6 +7,7 @@ import org.example.labthree.dataAccessLayer.dao.OwnerDao;
 import org.example.labthree.dataAccessLayer.entities.cat.CatBase;
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.cat.CatFinderDto;
+import org.example.labthree.dataAccessLayer.entities.owner.OwnerBase;
 import org.example.labthree.dataAccessLayer.entities.owner.OwnerDto;
 import org.example.labthree.dataAccessLayer.mappers.CatMapper;
 import org.example.labthree.dataAccessLayer.mappers.OwnerMapper;
@@ -14,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,31 @@ public class CatServiceImplementation implements CatService {
         var cat = catRepository.getReferenceById(id);
         return catMapper.convertToDto(cat);
     }
+
+    @Override
+    public List<CatDto> findCatByName(String name){
+        var cats = catRepository.findByName(name);
+        List<CatDto> catDtos = new ArrayList<CatDto>();
+        for(CatBase cat : cats){
+            CatDto catDto = catMapper.convertToDto(cat);
+            catDtos.add(catDto);
+        }
+        return catDtos;
+    }
+
+    @Override
+    public List<CatDto> findCatByOwnerId(UUID id) {
+        var owner = ownerRepository.getReferenceById(id);
+        List<CatBase> cats= owner.getCats();
+        List<CatDto> catDtos= new ArrayList<CatDto>();
+        for(CatBase cat : cats){
+            CatDto catDto = catMapper.convertToDto(cat);
+            catDtos.add(catDto);
+        }
+        return catDtos;
+    }
+
+
     @Override
     public void saveCat(CatDto cat){
         var catBase = catMapper.convertToBase(cat);
@@ -87,6 +115,10 @@ public class CatServiceImplementation implements CatService {
             cats = catRepository.findByColor(param.getColor());
         }
         return cats.stream().map(catMapper::convertToDto).collect(Collectors.toList());
+    }
+    @Override
+    public boolean IsItCurrentCatOwner(String username, UUID id){
+        return ownerRepository.findByName(username).getId() == catRepository.findById(id).get().getOwnerId().getId();
     }
 }
 

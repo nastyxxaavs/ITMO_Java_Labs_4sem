@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface CatService {
 
     public CatDto findCat(UUID id);
+    public List<CatDto> findCatByOwnerId(UUID id);
     public void saveCat(CatDto cat);
 
     public Boolean update(CatDto cat, UUID id);
@@ -20,5 +21,10 @@ public interface CatService {
 
     public List<CatDto> findAll();
     List<CatDto> findCatsByParam(CatFinderDto param);
+    //boolean IsItCurrentCatOwner(String username);
+    boolean IsItCurrentCatOwner(String username, UUID id);
+
+
+    public List<CatDto> findCatByName(String name);
 }
 

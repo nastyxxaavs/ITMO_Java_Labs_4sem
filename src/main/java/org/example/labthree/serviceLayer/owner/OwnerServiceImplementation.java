@@ -111,20 +111,6 @@ public class OwnerServiceImplementation  implements OwnerService {
         return owners.stream().map(ownerMapper::convertToDto).collect(Collectors.toList());
     }
 
-    /*@Override
-    public OwnerBase addOrUpdateOwnerWithDtoByUsername(OwnerDto ownerDto, String username){
-        UserBase user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("UserEntity with current username does not exists"));
-
-        var ownerBase = ownerMapper.convertToBase(ownerDto);
-        ownerBase.setName(user.getUsername());
-        ownerBase.setId(user.getId());
-        user.setOwner(ownerBase);
-
-        ownerRepository.save(ownerBase);
-        userRepository.save(user);
-
-        return ownerBase;
-    }*/
     @Override
     public OwnerDto getOwnerDtoByUsername(String username){
         return findOwnerByName(username);

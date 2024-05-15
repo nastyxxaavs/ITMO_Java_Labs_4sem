@@ -18,6 +18,7 @@ public interface CatDao extends JpaRepository<CatBase, UUID> {
     List<CatBase> findAll();
 
     List<CatBase> findAll(Sort sort);
+    //CatBase findByName(String name);
 
     List<CatBase> save(Iterable<? extends CatBase> entities);
 
@@ -31,4 +32,6 @@ public interface CatDao extends JpaRepository<CatBase, UUID> {
     List<CatBase> findByName(String name);
     List<CatBase> findBySpecies(String species);
     List<CatBase> findByDateOfBirth(LocalDate birthday);
+    Boolean existsCatBaseByOwnerId(OwnerBase owner);
+
 }

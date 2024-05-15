@@ -1,6 +1,7 @@
 package org.example.labthree.controllerLayer;
 
 
+import org.example.labthree.dataAccessLayer.entities.cat.CatBase;
 import org.example.labthree.dataAccessLayer.entities.cat.CatDto;
 import org.example.labthree.dataAccessLayer.entities.cat.CatFinderDto;
 
@@ -16,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Array;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,11 +39,9 @@ public class CatController {
     @PostMapping(value = "/cats/{username}", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> save(@PathVariable(name = "username") String username, @RequestBody CatDto cat) {
-        boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!userService.isCurrentUserEquals(username)){
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
-
         catService.saveCat(cat);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -55,19 +56,38 @@ public class CatController {
         @PathVariable(name = "username") String username
     ) {
         boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
+        OwnerDto owner = ownerService.findOwnerByName(username);
         if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         if (name != null || dateOfBirth != null || species != null || color != null) {
             var param = new CatFinderDto(name, dateOfBirth, species, color);
-            final List<CatDto> cat = catService.findCatsByParam(param);
+            if (isUserTheAdmin) {
+                final List<CatDto> cats = catService.findCatsByParam(param);
+                return cats != null
+                        ? new ResponseEntity<>(cats, HttpStatus.OK)
+                        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
+            final List<CatDto> cat = catService.findCatsByParam(param);//////////////////////дописать!!!!!!
             return cat != null
                     ? new ResponseEntity<>(cat, HttpStatus.OK)
                     : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            final List<CatDto> cats = catService.findAll();
+        }
+        else {
+            if (isUserTheAdmin) {
+                final List<CatDto> cats = catService.findAll();
+                return cats != null && !cats.isEmpty()
+                        ? new ResponseEntity<>(cats, HttpStatus.OK)
+                        : new ResponseEntity<>(cats, HttpStatus.NO_CONTENT);
+            }
+            final List<UUID> catBases = owner.getCats();
+            List<CatDto> cats = new ArrayList<CatDto>();
+            for (UUID each : catBases) {
+                CatDto catDto = catService.findCat(each);
+                cats.add(catDto);
+            }
 
             return cats != null && !cats.isEmpty()
                     ? new ResponseEntity<>(cats, HttpStatus.OK)
@@ -79,45 +99,35 @@ public class CatController {
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<CatDto> read(@PathVariable(name = "username") String username, @PathVariable(name = "id") UUID id) {
         boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!catService.IsItCurrentCatOwner(username, id) && !isUserTheAdmin) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
-        OwnerDto owner = ownerService.getOwnerDtoByUsername(username);
-        if (owner.getId().equals(catService.findOwnerById(id).getId())){
-            final CatDto cat = catService.findCat(id);
-            return cat != null
-                    ? new ResponseEntity<>(cat, HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-
-
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        final CatDto cat = catService.findCat(id);
+        return cat != null
+                ? new ResponseEntity<>(cat, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping(value = "/cats/{username}/{id}", produces = "application/json", consumes = "application/json")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> update(@PathVariable(name = "username") String username, @PathVariable(name = "id") UUID id, @RequestBody CatDto cat) {
         boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!catService.IsItCurrentCatOwner(username, id) && !isUserTheAdmin) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
-
         final boolean updated = catService.update(cat, id);
-
         return updated
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @DeleteMapping(value = "/cats/{username}/{id}", produces = "application/json", consumes = "application/json")
+    @DeleteMapping(value = "/cats/{username}/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> delete(@PathVariable(name = "username") String username, @PathVariable(name = "id") UUID id) {
         boolean isUserTheAdmin = userService.getUserByUsername(username).getRoles().stream().allMatch(roleBase -> roleBase.getName().equals("ROLE_ADMIN"));
-        if (!userService.isCurrentUserEquals(username) && !isUserTheAdmin){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!catService.IsItCurrentCatOwner(username, id) && !isUserTheAdmin) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
-
         final boolean deleted = catService.delete(id);
         return deleted
                 ? new ResponseEntity<>(HttpStatus.OK)

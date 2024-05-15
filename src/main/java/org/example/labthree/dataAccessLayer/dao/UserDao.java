@@ -11,13 +11,4 @@ public interface UserDao extends JpaRepository<UserBase, UUID> {
     Optional<UserBase> findByUsername(String name);
     //UserBase findByUsername(String name);
     Boolean existsByUsername(String userName);
-
-    /*@Override
-    void delete(UserBase entity);
-*/
-    // void delete(Optional<UserBase> user);
-
-
-    //void delete(Optional<UserBase> user);
-    //OwnerBase findOwnerById(UUID id);
 }
