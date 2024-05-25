@@ -1,0 +1,1 @@
+This repository contains labs №3 and №4 from the Java development technologies course. In laboratory 3, a REST-API application was created - a service for registering cats and their owners using Spring Boot. In laboratory 4 (lab-4 branch), Spring Security was superimposed on the existing service.
